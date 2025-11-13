@@ -1,27 +1,37 @@
 "use client";
-import Image from "next/image";
-import dynamic from 'next/dynamic';
-
-const ConnectWalletButton = dynamic(() => import('../components/ConnectWalletBtn'), {
-  ssr: false,
-});
-import { useWallet } from "@solana/wallet-adapter-react";
+import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
+import WalletInfo from "@/components/WalletInfo";
+import WalletActions from "@/components/WalletActions";
+import { useState, useEffect } from "react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 export default function Home() {
   const { publicKey } = useWallet();
+  const { connection } = useConnection();
+
+  const [balance, setBalance] = useState<number | null>(null);
+
+  const refreshBalance = async () => {
+    if (!publicKey) return;
+    const lamports = await connection.getBalance(publicKey);
+    setBalance(lamports / LAMPORTS_PER_SOL);
+  };
+
+  // Fetch balance whenever wallet changes
+  useEffect(() => {
+    refreshBalance();
+  }, [publicKey]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center  font-sans ">
-      <main className="flex flex-col items-center justify-center min-h-screen p-6">
-        <h1 className="text-3xl font-bold">Welcome to SolDash ;) </h1>
-        {/* {!publicKey && <ConnectWalletButton />} */}
-        <ConnectWalletButton />
-        
-        {publicKey && (
-          <p className="mt-4 text-gray-700">
-            Connected Wallet: {publicKey.toBase58()}
-          </p>
-        )}
-      </main>
-    </div>
+    <main className="min-h-screen bg-background">
+      <Navbar />
+      <div className="max-w-md mx-auto py-4 my-auto px-4">
+        <WalletInfo balance={balance} />
+        <WalletActions refreshBalance={refreshBalance} />
+      </div>
+      <Toaster />
+    </main>
   );
 }
