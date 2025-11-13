@@ -5,6 +5,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { toast } from "sonner";
 import SendSolDialog from "./SendSolDialog";
+import SignMessageDialog from "./SignMessageDialog";
 
 export default function WalletActions({
   refreshBalance,
@@ -45,6 +46,9 @@ export default function WalletActions({
     <div className="grid grid-cols-2 gap-2 mt-6">
       <Button onClick={requestAirdrop}>Airdrop</Button>
       <SendSolDialog refreshBalance={refreshBalance} />
+      {/* <div className="col-span-2"> */}
+        <SignMessageDialog />
+      {/* </div> */}
     </div>
   );
 }
